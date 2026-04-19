@@ -1,76 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# <p style="text-align:center">
-#     <a href="https://skills.network" target="_blank">
-#     <img src="https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/assets/logos/SN_web_lightmode.png" width="200" alt="Skills Network Logo"  />
-#     </a>
-# </p>
-# 
 
 # # **Building a Reflection Agent with LangGraph**
-# 
 
-# Estimated time needed: **45** minutes
-# 
-
-# In this guided project, you'll learn to build Reflection agents using LangGraph, a powerful tool for creating self-improving AI systems. Reflection agents represent a significant advancement in AI capabilities - they can evaluate their own outputs, identify weaknesses, and iteratively improve through feedback loops. You'll start by understanding the concept of reflection in AI, then build a complete reflection agent that can generate content, evaluate its quality, and refine outputs through multiple iterations. Working with a LinkedIn post generator as your example, you'll implement a graph-based workflow that mimics human-like reflective thinking, enabling the agent to transform basic content into polished, engaging outputs. By the end of this project, you'll have hands-on experience creating AI systems that can think critically about their own work and continuously improve their performance.
-# 
-
-# ## __Table of Contents__
-# 
-# <ol>
-#     <li><a href="#Objectives">Objectives</a></li>
-#     <li>
-#         <a href="#Setup">Setup</a>
-#         <ol>
-#             <li><a href="#Installing-Required-Libraries">Installing Required Libraries</a></li>
-#         </ol>
-#     </li>
-#     <li>
-#         <a href="#What-is-Reflection?">What is Reflection?</a>
-#     </li>
-#     <li>
-#         <a href="#Workflow-of-Reflection-Agent-in-LangGraph:">Workflow of Reflection Agent in LangGraph</a>
-#     </li>
-#     <li>
-#         <a href="#Building-an-Optimized-LinkedIn-Post-Generator-with-a-Reflection-Agent">Building an Optimized LinkedIn Post Generator with a Reflection Agent</a>
-#         <ol>
-#             <li><a href="#Instantiating-the-Language-Model">Instantiating the Language Model</a></li>
-#             <li><a href="#Generation-Prompt-for-Posts">Generation Prompt for Posts</a></li>
-#             <li><a href="#Creating-the-Chain-for-LinkedIn-Post-Generation">Creating the Chain for LinkedIn Post Generation</a></li>
-#             <li><a href="#Reflection-Prompt-for-LinkedIn-Post-Critique">Reflection Prompt for LinkedIn Post Critique</a></li>
-#             <li><a href="#Creating-the-Reflect-Chain">Creating the Reflect Chain</a></li>
-#             <li><a href="#Defining-the-Agent-State-for-Reflection-Agent">Defining the Agent State for Reflection Agent</a></li>
-#             <li><a href="#Defining-the-Generation-and-Reflection--Node">Defining the Generation and Reflection Node</a></li>
-#             <li><a href="#Why-HumanMessage?">Why HumanMessage?</a></li>
-#             <li><a href="#Adding-the-Generate-Node-to-the-Graph">Adding the Generate Node to the Graph</a></li>
-#             <li><a href="#Adding-the-Reflect-Node-to-the-Graph">Adding the Reflect Node to the Graph</a></li>
-#             <li><a href="#Setting-the-Entry-Point-in-the-Graph">Setting the Entry Point in the Graph</a></li>
-#             <li><a href="#Adding-a-Router-Node-for-Decision-Making">Adding a Router Node for Decision Making</a></li>
-#             <li><a href="#Compiling-the-Workflow">Compiling the Workflow</a></li>
-#             <li><a href="#Defining-Inputs-for-the-Workflow">Defining Inputs for the Workflow</a></li>
-#             <li><a href="#Executing-the-Workflow">Executing the Workflow</a></li>
-#             <li><a href="#Plotting-the-Graph">Plotting the Graph</a></li>
-#         </ol>
-#     </li>
-# </ol>
-# 
-
-# ## Objectives
-# 
-# After completing this lab you will be able to:
-# 
-# - Build reflection-enabled AI agents using LangGraph's graph-based workflow structure
-# - Implement a multi-step process that generates, evaluates, and refines AI-produced content
-# - Design conversational workflows with message state management for improved context retention
-# - Create conditional routing logic to control agent behavior and iteration processes
-# - Apply reflection techniques to enhance the quality and accuracy of AI-generated content
-# - Develop self-improving systems that can identify and address their own limitations
-# 
-
-# ----
-# 
 
 # ## Setup
 # 
@@ -141,61 +71,6 @@ watsonx_llm = ChatWatsonx(
 # Reflection agents encourage AI to function more like **System 2**, iterating over their work until the desired quality is achieved.
 # 
 
-# ## Workflow of Reflection Agent in LangGraph:
-# 
-# 1. **Generation Node: Generate Initial Output**
-#    - The first step in the process is the **generation node**, which quickly produces an initial output based on the given prompt. This stage is all about generating a first draft without focusing too much on perfection. It acts like an instinctive response, providing a rough version of the output. For example, if the task is to write a LinkedIn post, the generation node would come up with a basic idea. This draft is then passed to the next step for evaluation.
-#      
-# <br>
-# 
-# 2. **Evaluation Node: Evaluate Output for Quality**
-#    - After the initial output is generated, the **evaluation node** assesses its quality. This step is about checking if the output is good enough or if it needs improvement. The evaluation focuses on key aspects like whether the message is clear, engaging, and relevant. For instance, in the case of a LinkedIn post, the evaluation might decide if the post feels authentic, aligns with professional tone, or misses important context. If the output is deemed acceptable, it moves forward to the final step.
-# 
-# <br>
-# 
-# 3. **Reflection Node: Critique and Refine**
-#    - If the evaluation node determines that the output needs improvement, the **reflection node** steps in to refine the content. This step is more thoughtful and deliberate, where the system reflects on the output and looks for ways to improve it. The reflection node critiques the draft, suggests changes, and revises the content to make it more polished. It could involve enhancing tone, adding clarity, highlighting achievements, or making the post more engaging. The system keeps refining the output through this process until it reaches the desired quality level.
-#      
-# <br>
-# 
-# 4. **Final Output: Present Refined Result**
-#    - Once the reflection node has done its job, the final output is produced. This is the result of the reflection and evaluation processes, where the initial draft has been refined and improved. The agent now presents the final version of the content — a polished, high-quality LinkedIn post ready for publishing. After this step, the process concludes, and the final response is delivered to the user.
-# 
-# 
-# ---
-# 
-# **Example (LinkedIn Post Generation):**  
-# Imagine asking an AI to write a LinkedIn post announcing a job promotion:  
-# 
-# **Prompt:**  
-# "Write a LinkedIn post announcing my promotion to Engineering Manager."  
-# 
-# **AI’s Initial Output (System 1):**  
-# *"Excited to share that I’ve been promoted to Engineering Manager!"*  
-# 
-# **Reflection Step:**  
-# The AI reviews the post and asks:  
-# *"Does this post highlight leadership growth or express gratitude?"*  
-# 
-# **Refined Output (System 2):**  
-# *"I'm thrilled to share that I've been promoted to Engineering Manager at [Company]! Grateful for the mentorship, team collaboration, and opportunities that led to this moment. Looking forward to leading new initiatives and continuing to grow with this incredible team. #Leadership #CareerGrowth #EngineeringManager"*
-# 
-# ---
-# 
-
-# ### **Building an Optimized LinkedIn Post Generator with a Reflection Agent**
-# 
-# In this process, we aim to enhance the quality of AI-generated posts using a Reflection Agent. The idea is to allow the AI to generate a post and then critique its own output, refining the content iteratively based on feedback. This approach helps improve the engagement, relevance, and tone, ensuring a better final result.
-# 
-# We will be building a system that includes a generation phase where the post is generated, followed by a reflection phase where the AI reviews and refines the output. This cycle ensures that the AI produces higher-quality content in the end.
-# 
-# The following diagram illustrates the workflow of this system, showing the interaction between the generation and reflection nodes.
-# 
-
-# <div style="text-align: center;">
-#   <img src="https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/Cbuc3z8N1_Ew2ESw199Slw/Workflow.png" alt="Workflow" style="width: 40%; height: 500px;">
-# </div>
-# 
 
 # ### **Instantiating the Language Model**
 # 
@@ -245,17 +120,7 @@ generation_prompt = ChatPromptTemplate.from_messages(
 )
 
 
-# ### **Creating the Chain for LinkedIn Post Generation**
-# 
-# In this step, we are combining the **`generation_prompt`** with a language model (LLM) to form a complete chain that will allow the system to generate LinkedIn posts based on user input.
-# 
-# The **`generate_chain`** links the **`generation_prompt`** with the **LLM** (Large Language Model), enabling the system to generate a professional LinkedIn post after processing the user's input through the prompt.
-# 
-# - **`generation_prompt`**: This is the template that guides the model on how to generate the LinkedIn post, including the system message and the placeholder for the user's input.
-# - **`llm`**: This is the language model that will take the prompt and produce the post based on the input provided.
-# 
-# By using the pipe operator (`|`), we are chaining these components together so that the prompt flows seamlessly into the language model and the model generates the final LinkedIn post.
-# 
+
 
 # In[6]:
 
@@ -263,8 +128,8 @@ generation_prompt = ChatPromptTemplate.from_messages(
 generate_chain = generation_prompt | llm
 
 
-# <br>
-# 
+
+
 # ### **Reflection Prompt for LinkedIn Post Critique**
 # 
 # In this step, we define the **`reflection_prompt`**, which is a template used for generating critiques and recommendations to improve a user's LinkedIn post. This prompt guides the model to assess the quality of a LinkedIn post and provide structured, actionable feedback.
@@ -368,11 +233,6 @@ from langchain.schema import HumanMessage, AIMessage, SystemMessage
 graph = MessageGraph()
 
 
-# Behind the Scenes:
-# 
-# - As the user interacts with the agent, **`HumanMessage`** is added to the state.  
-# - The AI generates a response (**`AIMessage`**), which gets appended to the list.  
-# - If the output needs improvement, a **`SystemMessage`** can trigger a reflection phase to refine the response.
 # 
 
 # 
@@ -393,14 +253,7 @@ def generation_node(state: Sequence[BaseMessage]) -> List[BaseMessage]:
     return [AIMessage(content=generated_post.content)]
 
 
-# 
-# 
-# The `reflection_node` function plays a key role in improving the output generated in the `generation_node`. It critiques the original output and makes recommendations for refinement. The feedback mechanism helps enhance the final result, making it more in line with the desired outcome, whether that involves clarity, engagement, or tone adjustments.
-# 
-# - **Input**: The function takes `messages`, which is a sequence of `BaseMessage` objects. This includes previous AI responses, user inputs, and system-level instructions. The messages are used to provide context to the reflection process, guiding the generation of a more refined output.
-#   
-# - **Output**: The function invokes `reflect_chain`, passing the `messages` as input to critique and improve the content. After receiving the refined output, it returns the result as a `HumanMessage` object.
-# 
+
 
 # In[11]:
 
@@ -410,23 +263,7 @@ def reflection_node(messages: Sequence[BaseMessage]) -> List[BaseMessage]:
     return [HumanMessage(content=res.content)]  # Returns the refined message as HumanMessage for feedback
 
 
-# <br>
-# 
-# ### **Why `HumanMessage`?**
-# 
-# The output is wrapped in a `HumanMessage` because the reflection process is a form of feedback or critique given to the **generation agent**, and the feedback is intended to be treated as if it is coming from the user. This is important for the iterative process where the AI generates content and then receives human-like feedback to improve the output. In the context of this workflow, we treat the feedback as if a human is guiding the reflection agent to enhance its output.
-# 
-# - **HumanMessage** here is not used to represent user input directly but rather to provide feedback (as if from a human perspective). This feedback is passed back into the system, enabling the generation agent to revise its content. 
-# - It effectively gives the reflection node the authority to "speak" to the generation node, but in the context of providing critique and recommendations for refinement.
-# 
 
-# ### **Adding the Generate Node to the Graph**
-# 
-# Now we add the generation node to the graph using the `add_node` function. This function takes two parameters:  
-# 
-# 1. **Name**: A unique identifier for the node, in this case, `"generate"`.  
-# 2. **Function**: The function to be executed when this node is triggered, here `generation_node`.  
-# 
 
 # In[12]:
 
@@ -626,20 +463,4 @@ from IPython.display import Image, display
 display(Image(workflow.get_graph().draw_png()))
 
 
-# ## Authors
-# 
 
-# [Kunal Makwana](https://author.skills.network/instructors/kunal_makwana) is a Data Scientist at IBM and is currently pursuing his Master's in Computer Science at Dalhousie University.
-# 
-
-# ### Other Contributors
-# 
-
-# [Joseph Santarcangelo](https://author.skills.network/instructors/joseph_santarcangelo)
-# 
-
-# [Karan Goswami](https://author.skills.network/instructors/karan_goswami) is a Data Scientist at IBM and is currently pursuing his Masters in Engineering at McMaster University.
-# 
-
-# Copyright © 2025 IBM Corporation. All rights reserved.
-# 
